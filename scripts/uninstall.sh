@@ -68,14 +68,7 @@ uninstall() {
     fi
   fi
 
-  # Remove Glowkey
-  if [ -d "$HOME/.local/share/glowkey" ]; then
-    if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would remove ~/.local/share/glowkey"
-    else
-      rm -rf "$HOME/.local/share/glowkey" && log_info "Removed Glowkey files"
-    fi
-  fi
+  # Note: personal projects (e.g. Glowkey) are managed outside this installer
 
   # Remove user from docker group
   if id -nG "$USER" | grep -qw docker; then
