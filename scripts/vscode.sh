@@ -68,9 +68,20 @@ EOF'
           # verify sources/checksums if possible
           if command_exists makepkg; then
             log_info "Running makepkg --verify to validate sources"
-            makepkg --verify || log_warning "makepkg --verify failed or not all files present"
+            if ! makepkg --verify; then
+              log_error "makepkg --verify failed; aborting AUR build/install"
+              popd >/dev/null
+              rm -rf "$tmpd"
+              return 1
+            fi
+            log_info "makepkg --verify passed"
             log_info "Building and installing package via makepkg -si --noconfirm"
-            run_as_root makepkg -si --noconfirm || log_warning "makepkg build/install failed"
+            if ! run_as_root makepkg -si --noconfirm; then
+              log_error "makepkg build/install failed"
+              popd >/dev/null
+              rm -rf "$tmpd"
+              return 1
+            fi
           else
             log_warning "makepkg not available; please install base-devel or use an AUR helper"
           fi
