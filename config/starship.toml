@@ -2,7 +2,6 @@
 success_symbol = "[➜](bold cyan)"
 error_symbol = "[➜](bold red)"
 
-
 "$schema" = 'https://starship.rs/config-schema.json'
 
 [bun]

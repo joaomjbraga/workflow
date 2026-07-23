@@ -12,7 +12,7 @@ install_fonts() {
   else
     src_dir=""
   fi
-  local dest_dir="$HOME/.local/share"
+  local dest_dir="$HOME/.local/share/fonts"
   mkdir -p "$dest_dir"
 
   if [ -z "$src_dir" ] || [ ! -d "$src_dir" ]; then

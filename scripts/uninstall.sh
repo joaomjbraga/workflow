@@ -20,9 +20,9 @@ uninstall() {
       [ -e "$f" ] || continue
       local base="$(basename "$f")"
       if [ "${DRY_RUN:-false}" = "true" ]; then
-        log_info "[DRY RUN] Would remove font $base from ~/.local/share"
+        log_info "[DRY RUN] Would remove font $base from ~/.local/share/fonts"
       else
-        rm -f "$HOME/.local/share/$base" && log_info "Removed font $base"
+        rm -f "$HOME/.local/share/fonts/$base" && log_info "Removed font $base"
       fi
     done
   fi
