@@ -44,6 +44,28 @@ install_go() {
     return 1
   fi
 
+  # Attempt to verify checksum if possible
+  local local_sum=""
+  local remote_sum=""
+  if command_exists sha256sum; then
+    local_sum=$(sha256sum "$tarball" | awk '{print $1}')
+    remote_sum=$(curl -fsSL "https://go.dev/dl/?mode=json" | grep -o "\"file\":\"$tarball\"[^\"]*\"sha256\":\"[0-9a-f]\+" || true)
+    remote_sum=$(printf '%s' "$remote_sum" | sed -E 's/.*"sha256":"([0-9a-f]+).*/\1/' || true)
+  fi
+
+  if [ -n "${remote_sum}" ]; then
+    if [ "${local_sum}" != "${remote_sum}" ]; then
+      log_error "Checksum mismatch for $tarball (downloaded: ${local_sum}, expected: ${remote_sum})"
+      popd >/dev/null
+      rm -rf "$td"
+      return 1
+    else
+      log_info "Checksum verified for $tarball"
+    fi
+  else
+    log_warning "Could not verify checksum for $tarball; proceeding without verification"
+  fi
+
   run_as_root rm -rf /usr/local/go || true
   run_as_root tar -C /usr/local -xzf "$tarball" || { log_warning "Failed to extract Go tarball"; popd >/dev/null; rm -rf "$td"; return 1; }
   popd >/dev/null
@@ -63,3 +85,5 @@ install_go() {
 
   log_info "Go installed to /usr/local/go"
 }
+
+export -f install_go

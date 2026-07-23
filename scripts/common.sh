@@ -10,6 +10,22 @@ export PKG_MANAGER=""
 LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/workflow"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/install.log"
+LOG_MAX_SIZE=$((5 * 1024 * 1024))
+LOG_BACKUPS=5
+
+# rotate logs if file too large
+if [ -f "$LOG_FILE" ]; then
+  local_size=$(stat -c%s "$LOG_FILE" 2>/dev/null || echo 0)
+  if [ "$local_size" -ge "$LOG_MAX_SIZE" ]; then
+    # rotate
+    for i in $(seq $LOG_BACKUPS -1 2); do
+      if [ -f "$LOG_FILE.$((i-1))" ]; then
+        mv "$LOG_FILE.$((i-1))" "$LOG_FILE.$i" || true
+      fi
+    done
+    mv "$LOG_FILE" "$LOG_FILE.1" || true
+  fi
+fi
 
 
 command_exists() {
@@ -56,7 +72,11 @@ install_package() {
   case "$PKG_MANAGER" in
     apt)
       run_as_root apt-get update -y || true
-      run_as_root apt-get install -y --no-install-recommends "$pkg"
+      if [ "${AUTO_YES:-false}" = "true" ]; then
+        run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$pkg"
+      else
+        run_as_root apt-get install -y --no-install-recommends "$pkg"
+      fi
       ;;
     pacman)
       run_as_root pacman -Sy --noconfirm --needed "$pkg"
@@ -92,7 +112,14 @@ package_installed() {
 verify_installation() {
   printf "%-20s %s\n" "Zsh:" "$(zsh --version 2>/dev/null || echo 'not found')"
   printf "%-20s %s\n" "Node:" "$(node --version 2>/dev/null || echo 'not found')"
-  printf "%-20s %s\n" "NVM:" "$(nvm --version 2>/dev/null || echo 'not found')" 2>/dev/null || true
+  # NVM is a shell function; check NVM_DIR and source if available to query
+  if [ -d "$HOME/.nvm" ] && [ -s "$HOME/.nvm/nvm.sh" ]; then
+    # shellcheck disable=SC1090
+    . "$HOME/.nvm/nvm.sh" >/dev/null 2>&1 || true
+    printf "%-20s %s\n" "NVM:" "$(command -v nvm >/dev/null 2>&1 && nvm --version || echo 'not found')"
+  else
+    printf "%-20s %s\n" "NVM:" "not found"
+  fi
   printf "%-20s %s\n" "Docker:" "$(docker --version 2>/dev/null || echo 'not found')"
   printf "%-20s %s\n" "Go:" "$(go version 2>/dev/null || echo 'not found')"
   printf "%-20s %s\n" "scrcpy:" "$(scrcpy --version 2>/dev/null || echo 'not found')"

@@ -4,6 +4,33 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 resolve_pkg_name() {
   local key="$1"
+  # Allow overrides via config/packages.toml in repo root
+  local cfg
+  cfg="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/config/packages.toml"
+  if [ -f "$cfg" ]; then
+    # extract the relevant section for this package manager
+    local section
+    section=$(awk -v pm="$PKG_MANAGER" '
+      BEGIN{capture=0}
+      /^\[/{gsub(/[][]/,"",$0); if($0==pm) {capture=1; next} else {capture=0}}
+      capture==1 {print}
+    ' "$cfg" || true)
+    if [ -n "$section" ]; then
+      # try to find key = "value" or key = value
+      local val
+      val=$(printf '%s' "$section" | sed -n -E 's/^[[:space:]]*'"$key"'[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' || true)
+      if [ -z "$val" ]; then
+        val=$(printf '%s' "$section" | sed -n -E 's/^[[:space:]]*'"$key"'[[:space:]]*=[[:space:]]*(.*)/\1/p' || true)
+        val=$(printf '%s' "$val" | sed 's/^"//;s/"$//')
+      fi
+      val=$(printf '%s' "$val" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      if [ -n "$val" ]; then
+        echo "$val"
+        return 0
+      fi
+    fi
+  fi
+
   case "$PKG_MANAGER" in
     apt)
       case "$key" in

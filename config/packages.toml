@@ -1,0 +1,20 @@
+# Package overrides per package manager.
+# Example:
+# [apt]
+# go = "golang"
+# docker = "docker.io"
+
+[apt]
+go = "golang"
+docker = "docker.io"
+docker-compose = "docker-compose-plugin"
+
+[pacman]
+go = "go"
+docker = "docker"
+docker-compose = "docker-compose"
+
+[dnf]
+go = "golang"
+docker = "docker"
+docker-compose = "docker-compose-plugin"

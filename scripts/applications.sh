@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 install_applications() {
   # scrcpy
@@ -20,7 +22,7 @@ install_applications() {
     if [ "${DRY_RUN:-false}" = "true" ]; then
       log_info "[DRY RUN] Would check and install Glowkey from https://github.com/joaomjbraga/glowkey.git"
     else
-      if [ -d "$(pwd)/glowkey" ] || git ls-remote --exit-code https://github.com/joaomjbraga/glowkey.git >/dev/null 2>&1; then
+      if [ -d "$REPO_ROOT/glowkey" ] || git ls-remote --exit-code https://github.com/joaomjbraga/glowkey.git >/dev/null 2>&1; then
         log_info "Installing Glowkey from repository"
         local td
         td=$(temp_dir)

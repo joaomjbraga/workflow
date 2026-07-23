@@ -2,10 +2,15 @@
 set -Eeuo pipefail
 
 DRY_RUN=false
+AUTO_YES=false
 while (("$#")); do
   case "$1" in
     --dry-run)
       DRY_RUN=true
+      shift
+      ;;
+    --yes|--assume-yes|-y)
+      AUTO_YES=true
       shift
       ;;
     --help|-h)
@@ -19,20 +24,31 @@ while (("$#")); do
 done
 
 export DRY_RUN
+export AUTO_YES
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/scripts/common.sh"
-source "$SCRIPT_DIR/scripts/distro.sh"
-source "$SCRIPT_DIR/scripts/packages.sh"
-source "$SCRIPT_DIR/scripts/docker.sh"
-source "$SCRIPT_DIR/scripts/node.sh"
-source "$SCRIPT_DIR/scripts/zsh.sh"
-source "$SCRIPT_DIR/scripts/fonts.sh"
-source "$SCRIPT_DIR/scripts/android.sh"
-source "$SCRIPT_DIR/scripts/applications.sh"
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# If the script is executed from inside scripts/ (edge cases), normalize to repo root
+if [ -d "$BASE_DIR/scripts" ] && [ -f "$BASE_DIR/install.sh" ]; then
+  REPO_ROOT="$BASE_DIR"
+else
+  REPO_ROOT="$(cd "$BASE_DIR/.." && pwd)"
+fi
+
+SCRIPTS_DIR="$REPO_ROOT/scripts"
+source "$SCRIPTS_DIR/common.sh"
+source "$SCRIPTS_DIR/distro.sh"
+source "$SCRIPTS_DIR/packages.sh"
+source "$SCRIPTS_DIR/docker.sh"
+source "$SCRIPTS_DIR/node.sh"
+source "$SCRIPTS_DIR/zsh.sh"
+source "$SCRIPTS_DIR/fonts.sh"
+source "$SCRIPTS_DIR/android.sh"
+source "$SCRIPTS_DIR/applications.sh"
+source "$SCRIPTS_DIR/logging.sh" || true
 # source arch and go after packages so they can override defaults when needed
-source "$SCRIPT_DIR/scripts/arch.sh" || true
-source "$SCRIPT_DIR/scripts/go.sh" || true
+source "$SCRIPTS_DIR/arch.sh" || true
+source "$SCRIPTS_DIR/go.sh" || true
+source "$SCRIPTS_DIR/uninstall.sh" || true
 
 main() {
   if [ "$DRY_RUN" = true ]; then
@@ -64,6 +80,9 @@ main() {
   log_info "Installing fonts"
   install_fonts
 
+  log_info "Installing logrotate config (optional)"
+  install_logrotate_config || log_warning "logrotate install failed or skipped"
+
   if [[ "$PKG_MANAGER" == "pacman" ]]; then
     log_info "Applying Arch-specific configuration"
     configure_arch
@@ -74,5 +93,11 @@ main() {
 
   log_info "If you were added to the docker group, a session restart may be required."
 }
+
+# If user requested uninstall
+if [ "${1:-}" = "uninstall" ] || [ "${1:-}" = "--undo" ]; then
+  uninstall
+  exit 0
+fi
 
 main "$@"

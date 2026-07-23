@@ -1,0 +1,18 @@
+# Rotate workflow installer logs weekly, keep 4 weeks
+/var/log/workflow/install.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+    create 0644 root root
+}
+
+# Fallback to XDG cache path when run as user (not installed system-wide)
+~/.cache/workflow/install.log {
+    weekly
+    rotate 4
+    compress
+    missingok
+    notifempty
+}

@@ -39,4 +39,3 @@ Solução de problemas
 - Verifique o log em `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log` para detalhes.
 - Use `./install.sh --dry-run` para visualizar as alterações antes de aplicá-las.
 
-Se quiser, posso também criar um `CHANGELOG.md` ou um `Makefile` simples com alvos por módulo (por exemplo, `make docker` ou `make fonts`).
