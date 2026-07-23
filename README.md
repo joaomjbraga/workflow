@@ -1,6 +1,10 @@
 # workflow
 
-Ferramenta pessoal de pós-instalação para Linux. Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
+Ferramenta pessoal de pós-instalação para Linux.
+
+ATENÇÃO: este repositório contém o meu "workflow" pessoal — ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo de `install.sh` e os scripts em `scripts/` antes de executar.
+
+Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
 
 Início rápido:
 
@@ -15,6 +19,8 @@ Logs são gravados em: `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log`.
 Fontes: coloque arquivos `.ttf` ou `.otf` nas pastas `font/` ou `fonts/` na raiz do repositório; eles serão copiados para `~/.local/share/`.
 
 Veja os diretórios `scripts/` e `config/` para a implementação modular. O instalador é idempotente e pode ser executado repetidas vezes com segurança.
+
+Personalização importante: o instalador pode remover componentes do sistema (ex.: `podman`, `snapd`) quando você executar com `--yes`. Use `--dry-run` para revisar ações antes de aplicar.
 
 O que foi implementado
 - Detecção de distribuição (`/etc/os-release`) e mapeamento de gerenciador de pacotes para `apt`, `pacman` e `dnf`.

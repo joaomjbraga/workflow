@@ -48,6 +48,7 @@ source "$SCRIPTS_DIR/logging.sh" || true
 source "$SCRIPTS_DIR/snap.sh" || true
 source "$SCRIPTS_DIR/vscode.sh" || true
 source "$SCRIPTS_DIR/git.sh" || true
+source "$SCRIPTS_DIR/podman.sh" || true
 # source arch and go after packages so they can override defaults when needed
 source "$SCRIPTS_DIR/arch.sh" || true
 source "$SCRIPTS_DIR/go.sh" || true
@@ -66,6 +67,9 @@ main() {
 
   log_info "Installing Docker"
   install_docker
+
+  log_info "Checking for podman and removing if requested"
+  remove_podman || log_warning "podman removal failed or skipped"
 
   log_info "Installing Go (if supported by distro packages or tarball fallback)"
   install_go || log_warning "Go installation failed or not supported"

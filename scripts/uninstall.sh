@@ -134,5 +134,10 @@ uninstall() {
     remove_snapd || log_warning "snapd removal during uninstall failed or skipped"
   fi
 
+  # Attempt to remove podman during uninstall
+  if type -t remove_podman >/dev/null 2>&1; then
+    remove_podman || log_warning "podman removal during uninstall failed or skipped"
+  fi
+
   log_success "Uninstall finished (dry-run=${DRY_RUN:-false})"
 }
