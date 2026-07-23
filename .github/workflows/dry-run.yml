@@ -9,7 +9,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, fedora-latest]
+        # Use only GitHub-hosted runners here (ubuntu). Fedora is not a hosted label
+        # and will remain queued waiting for a runner — run Fedora in a container instead.
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v4
@@ -23,6 +25,21 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: archlinux:latest
+
+  dry-run-fedora:
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare Fedora container
+        run: |
+          dnf install -y git curl ca-certificates || true
+      - name: Run install.sh (dry-run) on Fedora container
+        run: |
+          chmod +x ./install.sh
+          ./install.sh --dry-run --yes
 
     steps:
       - uses: actions/checkout@v4
