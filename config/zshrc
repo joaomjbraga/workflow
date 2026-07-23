@@ -37,9 +37,10 @@ if command -v dircolors >/dev/null 2>&1; then
 fi
 
 # Aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+alias ls='ls --color=auto'
+alias ll='ls -alF --color=auto'
+alias la='ls -A --color=auto'
+alias l='ls -CF --color=auto'
 
 # PATH adjustments
 export PATH="$HOME/.local/share:$PATH"

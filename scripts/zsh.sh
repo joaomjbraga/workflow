@@ -48,6 +48,17 @@ configure_zsh() {
   # Remove legacy bindkeys that trigger zsh-syntax-highlighting warnings.
   sed -i.bak '/up-line-or-beginning-search/d; /down-line-or-beginning-search/d' "$target" 2>/dev/null || true
 
+  # Ensure bash also gets colorized ls settings for the current shell.
+  local bash_target="$HOME/.bashrc"
+  if [ -f "$bash_target" ]; then
+    log_info "$bash_target exists — preserving and ensuring ls color settings are present"
+  else
+    cp "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../config/bashrc" "$bash_target"
+  fi
+  if ! grep -q "Colorized ls" "$bash_target" 2>/dev/null; then
+    cat "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../config/bashrc" >>"$bash_target"
+  fi
+
   # Ensure safe history navigation bindings are present.
   grep -q "history-beginning-search-backward" "$target" || printf "bindkey '^[[A' history-beginning-search-backward\n" >>"$target"
   grep -q "history-beginning-search-forward" "$target" || printf "bindkey '^[[B' history-beginning-search-forward\n" >>"$target"
@@ -64,6 +75,11 @@ if command -v dircolors >/dev/null 2>&1; then
 fi
 EOF
   fi
+
+  grep -q "alias ls='ls --color=auto'" "$target" || printf "alias ls='ls --color=auto'\n" >>"$target"
+  grep -q "alias ll='ls -alF --color=auto'" "$target" || printf "alias ll='ls -alF --color=auto'\n" >>"$target"
+  grep -q "alias la='ls -A --color=auto'" "$target" || printf "alias la='ls -A --color=auto'\n" >>"$target"
+  grep -q "alias l='ls -CF --color=auto'" "$target" || printf "alias l='ls -CF --color=auto'\n" >>"$target"
 
   # Ensure plugin load lines exist (syntax highlighting last)
   grep -q "zsh-autosuggestions" "$target" || printf "source %s/zsh-autosuggestions/zsh-autosuggestions.zsh\n" "$plugin_dir" >>"$target"
