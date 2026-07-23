@@ -47,6 +47,7 @@ source "$SCRIPTS_DIR/applications.sh"
 source "$SCRIPTS_DIR/logging.sh" || true
 source "$SCRIPTS_DIR/snap.sh" || true
 source "$SCRIPTS_DIR/vscode.sh" || true
+source "$SCRIPTS_DIR/git.sh" || true
 # source arch and go after packages so they can override defaults when needed
 source "$SCRIPTS_DIR/arch.sh" || true
 source "$SCRIPTS_DIR/go.sh" || true
@@ -108,6 +109,12 @@ fi
 # If user requested only VS Code
 if [ "${1:-}" = "vscode" ]; then
   install_vscode
+  exit 0
+fi
+
+# If user requested only git configuration
+if [ "${1:-}" = "git-config" ]; then
+  configure_git
   exit 0
 fi
 

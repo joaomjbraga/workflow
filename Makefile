@@ -37,3 +37,6 @@ apply:
 
 vscode:
 	$(INSTALL) --yes vscode
+
+git-config:
+	$(INSTALL) git-config
