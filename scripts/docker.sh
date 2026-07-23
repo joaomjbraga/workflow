@@ -14,11 +14,22 @@ install_docker() {
 
   run_as_root systemctl enable --now docker || log_warning "Failed to enable/start docker"
 
-  # Add user to docker group
-  if id -nG "$USER" | grep -qw docker; then
-    log_info "User $USER already in docker group"
+  # Determine target user: prefer SUDO_USER, then USER, then current owner
+  TARGET_USER="${SUDO_USER:-${USER:-}}
+"
+  if [ -z "$TARGET_USER" ]; then
+    # try to detect an interactive user
+    TARGET_USER=$(logname 2>/dev/null || id -un 2>/dev/null || echo "")
+  fi
+
+  if [ -n "$TARGET_USER" ]; then
+    if id -nG "$TARGET_USER" | grep -qw docker; then
+      log_info "User $TARGET_USER already in docker group"
+    else
+      run_as_root usermod -aG docker "$TARGET_USER" || log_warning "Could not add $TARGET_USER to docker group"
+      log_info "Added $TARGET_USER to docker group (may require relogin)"
+    fi
   else
-    run_as_root usermod -aG docker "$USER" || log_warning "Could not add $USER to docker group"
-    log_info "Added $USER to docker group (may require relogin)"
+    log_warning "Could not determine target user to add to docker group; skipping"
   fi
 }
