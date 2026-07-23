@@ -16,22 +16,5 @@ install_applications() {
   fi
 
   # Glowkey
-  if command_exists glowkey; then
-    log_info "Glowkey already available"
-  else
-    if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would check and install Glowkey from https://github.com/joaomjbraga/glowkey.git"
-    else
-      if [ -d "$REPO_ROOT/glowkey" ] || git ls-remote --exit-code https://github.com/joaomjbraga/glowkey.git >/dev/null 2>&1; then
-        log_info "Installing Glowkey from repository"
-        local td
-        td=$(temp_dir)
-        git clone https://github.com/joaomjbraga/glowkey.git "$td/glowkey" || { log_warning "Could not clone glowkey"; return 0; }
-        (cd "$td/glowkey" && ./install.sh) || log_warning "Glowkey install script failed"
-        rm -rf "$td"
-      else
-        log_warning "Glowkey repo not reachable; skipping"
-      fi
-    fi
-  fi
+  # Glowkey intentionally removed from installer; it's managed separately by the user.
 }
