@@ -93,6 +93,15 @@ install_base_dependencies() {
   # Ensure flatpak remote exists when flatpak is available
   if command_exists flatpak; then
     run_as_root flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
+
+    # If systemd is present, enable Flatpak-related services if available
+    if [ -d "/run/systemd/system" ] && command -v systemctl >/dev/null 2>&1; then
+      for unit in flatpak.service flatpak-system-helper.service; do
+        if systemctl list-unit-files | grep -q "^${unit}"; then
+          run_as_root systemctl enable --now "$unit" || true
+        fi
+      done
+    fi
   fi
 }
 
