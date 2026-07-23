@@ -25,8 +25,9 @@ Personalização importante: o instalador pode remover componentes do sistema (e
 O que foi implementado
 - Detecção de distribuição (`/etc/os-release`) e mapeamento de gerenciador de pacotes para `apt`, `pacman` e `dnf`.
 - Instalação idempotente de pacotes com resolução de nomes por distribuição.
-- Instaladores para: Docker (e gestão de grupo), NVM + Node.js (v22), Go (pacote da distro ou fallback por tarball), scrcpy, Starship, Zsh (com plugins), Glowkey e Android Studio (via Flatpak).
+- Instaladores para: Docker (e gestão de grupo), NVM + Node.js (v22), Go (pacote da distro ou fallback por tarball), scrcpy, Starship, Zsh (com plugins) e Android Studio (via Flatpak).
 - Cópia de fontes de `font/` ou `fonts/` para `~/.local/share/` (suporta `.ttf` e `.otf`).
+- Algumas ferramentas (por exemplo, projetos pessoais como "Glowkey") são gerenciadas fora deste instalador e não serão instaladas automaticamente; instale-as manualmente quando desejar.
 - Tarefas específicas do Arch: habilitação de `fstrim.timer` e instalação de `yay-bin` via AUR (diretório temporário para build).
 
 Segurança e idempotência
