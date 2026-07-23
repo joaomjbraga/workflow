@@ -26,6 +26,16 @@ jobs:
     container:
       image: archlinux:latest
 
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare container
+        run: |
+          pacman -Syu --noconfirm bash git curl ca-certificates || true
+      - name: Run install.sh (dry-run) on Arch container
+        run: |
+          chmod +x ./install.sh
+          ./install.sh --dry-run --yes
+
   dry-run-fedora:
     runs-on: ubuntu-latest
     container:
@@ -37,16 +47,6 @@ jobs:
         run: |
           dnf install -y git curl ca-certificates || true
       - name: Run install.sh (dry-run) on Fedora container
-        run: |
-          chmod +x ./install.sh
-          ./install.sh --dry-run --yes
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Prepare container
-        run: |
-          pacman -Syu --noconfirm bash git curl ca-certificates || true
-      - name: Run install.sh (dry-run) on Arch container
         run: |
           chmod +x ./install.sh
           ./install.sh --dry-run --yes
