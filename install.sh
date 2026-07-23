@@ -86,6 +86,9 @@ main() {
   log_info "Installing logrotate config (optional)"
   install_logrotate_config || log_warning "logrotate install failed or skipped"
 
+  log_info "Installing Visual Studio Code (stable)"
+  install_vscode || log_warning "VS Code installation failed or skipped"
+
   if [[ "$PKG_MANAGER" == "pacman" ]]; then
     log_info "Applying Arch-specific configuration"
     configure_arch
