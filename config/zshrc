@@ -19,9 +19,9 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle ':completion:*' list-colors 'yes'
 
-# History navigation with arrows
-bindkey '^[[A' up-line-or-beginning-search
-bindkey '^[[B' down-line-or-beginning-search
+# History navigation with arrows (use built-in widgets to avoid zsh-syntax-highlighting warnings)
+bindkey '^[[A' history-beginning-search-backward
+bindkey '^[[B' history-beginning-search-forward
 
 # Quality of life
 setopt AUTO_CD
