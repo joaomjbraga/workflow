@@ -27,6 +27,15 @@ bindkey '^[[B' history-beginning-search-forward
 setopt AUTO_CD
 setopt CORRECT
 
+# Restore directory colors in ls and completion
+export CLICOLOR=1
+export LS_COLORS='di=1;36:ln=1;35:so=1;32:pi=1;33:ex=1;32:bd=1;34:cd=1;34:su=1;31:sg=1;31:tw=1;33:ow=1;33'
+
+# Enable colorized ls on systems that support it
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
+fi
+
 # Aliases
 alias ll='ls -alF'
 alias la='ls -A'

@@ -52,6 +52,19 @@ configure_zsh() {
   grep -q "history-beginning-search-backward" "$target" || printf "bindkey '^[[A' history-beginning-search-backward\n" >>"$target"
   grep -q "history-beginning-search-forward" "$target" || printf "bindkey '^[[B' history-beginning-search-forward\n" >>"$target"
 
+  # Ensure directory colors are enabled for existing zsh setups too.
+  if ! grep -q "CLICOLOR" "$target" 2>/dev/null; then
+    cat <<'EOF' >>"$target"
+
+# Restore directory colors in ls and completion
+export CLICOLOR=1
+export LS_COLORS='di=1;36:ln=1;35:so=1;32:pi=1;33:ex=1;32:bd=1;34:cd=1;34:su=1;31:sg=1;31:tw=1;33:ow=1;33'
+if command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors -b)"
+fi
+EOF
+  fi
+
   # Ensure plugin load lines exist (syntax highlighting last)
   grep -q "zsh-autosuggestions" "$target" || printf "source %s/zsh-autosuggestions/zsh-autosuggestions.zsh\n" "$plugin_dir" >>"$target"
   grep -q "zsh-syntax-highlighting" "$target" || printf "source %s/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh\n" "$plugin_dir" >>"$target"
