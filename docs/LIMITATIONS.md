@@ -1,10 +1,10 @@
-Limitations and known issues
+Limitações e problemas conhecidos
 
-- Package name mappings are basic. Some distributions or versions may use different package names or meta-packages. If a package fails to install, check the distro's package name and update `scripts/packages.sh::resolve_pkg_name`.
-- The Go tarball fallback installs to `/usr/local/go` and appends the path to `~/.profile`. Users with custom shells or profile handling may need to source the path manually.
-- The installer requires network access for downloads and git clones. In restricted environments, pre-download artifacts or provide local mirrors.
-- The AUR build for `yay-bin` requires `makepkg` and `base-devel` tools and will run `makepkg -si` which performs system-level package installation.
-- The script uses `sudo` for privileged operations; running unattended on systems with no sudo configured will fail.
-- No interactive prompt handling beyond `chsh` fallback; consider running interactively when changing shells.
+- Os mapeamentos de nomes de pacotes são básicos. Algumas distribuições ou versões podem usar nomes diferentes para pacotes ou meta-pacotes. Se um pacote falhar ao instalar, verifique o nome do pacote na sua distro e atualize `scripts/packages.sh::resolve_pkg_name`.
+- O fallback que instala o Go por tarball utiliza `/usr/local/go` e adiciona o caminho em `~/.profile`. Usuários com shells personalizados ou mecanismos diferentes de carregamento de perfil podem precisar configurar o PATH manualmente.
+- O instalador requer acesso à rede para downloads e clones via `git`. Em ambientes restritos, faça o pré-download dos artefatos ou forneça mirrors locais.
+- A compilação via AUR para `yay-bin` requer `makepkg` e as ferramentas de `base-devel` e executará `makepkg -si`, o que realiza instalações no sistema.
+- O script utiliza `sudo` para operações privilegiadas; executar de forma não interativa em sistemas sem `sudo` configurado resultará em falha.
+- Não há tratamento avançado de prompts interativos além do `chsh` como fallback; considere executar de forma interativa ao trocar o shell padrão.
 
-If you encounter an issue, open an issue in the repository with the `--dry-run` output and relevant lines from `~/.cache/workflow/install.log`.
+Se encontrar um problema, abra uma issue no repositório incluindo a saída de `--dry-run` e linhas relevantes do log em `~/.cache/workflow/install.log`.

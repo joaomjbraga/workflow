@@ -1,42 +1,42 @@
 # workflow
 
-Personal post-install bootstrap for Linux. Run `./install.sh` to provision a fresh system.
+Ferramenta pessoal de pós-instalação para Linux. Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
 
-Quick start:
+Início rápido:
 
 ```bash
 chmod +x install.sh
-./install.sh --dry-run   # simulate actions without making changes
-./install.sh             # run for real
+./install.sh --dry-run   # simula as ações sem fazer alterações
+./install.sh             # executa de fato
 ```
 
-Logs are written to: `$XDG_CACHE_HOME or ~/.cache/workflow/install.log`.
+Logs são gravados em: `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log`.
 
-Fonts: drop `.ttf` or `.otf` files in either `font/` or `fonts/` at repository root; they will be copied to `~/.local/share/`.
+Fontes: coloque arquivos `.ttf` ou `.otf` nas pastas `font/` ou `fonts/` na raiz do repositório; eles serão copiados para `~/.local/share/`.
 
-See `scripts/` and `config/` for modular implementation. The installer is idempotent and safe to run repeatedly.
+Veja os diretórios `scripts/` e `config/` para a implementação modular. O instalador é idempotente e pode ser executado repetidas vezes com segurança.
 
-What this implements
-- Distribution detection (`/etc/os-release`) and package manager mapping for `apt`, `pacman`, and `dnf`.
-- Idempotent package installation with logical package name resolution per-distro.
-- Installers for: Docker (and group management), NVM + Node.js (v22), Go (distro package or tarball fallback), scrcpy, Starship, Zsh (with plugins), Glowkey, Android Studio (Flatpak).
-- Fonts copy from `font/` or `fonts/` into `~/.local/share/` (supports `.ttf` and `.otf`).
-- Arch-specific tasks: `fstrim.timer` enablement and `yay-bin` installation via AUR (temporary build directory).
+O que foi implementado
+- Detecção de distribuição (`/etc/os-release`) e mapeamento de gerenciador de pacotes para `apt`, `pacman` e `dnf`.
+- Instalação idempotente de pacotes com resolução de nomes por distribuição.
+- Instaladores para: Docker (e gestão de grupo), NVM + Node.js (v22), Go (pacote da distro ou fallback por tarball), scrcpy, Starship, Zsh (com plugins), Glowkey e Android Studio (via Flatpak).
+- Cópia de fontes de `font/` ou `fonts/` para `~/.local/share/` (suporta `.ttf` e `.otf`).
+- Tarefas específicas do Arch: habilitação de `fstrim.timer` e instalação de `yay-bin` via AUR (diretório temporário para build).
 
-Safety and idempotency
-- Scripts check for existing commands and packages before installing.
-- `install.sh --dry-run` simulates all steps and prints what would run without making changes.
-- Operations that require privileges use `sudo` only when necessary.
+Segurança e idempotência
+- Os scripts verificam se comandos e pacotes já existem antes de instalar.
+- `install.sh --dry-run` simula todas as etapas e mostra o que seria executado sem alterar o sistema.
+- Operações que exigem privilégios usam `sudo` apenas quando necessário.
 
-Limitations & notes
-- Package names vary between distributions; `resolve_pkg_name` provides basic mappings but may need manual adjustments for some packages.
-- The Go installer prefers distro packages; when missing, it downloads a tarball and installs to `/usr/local/go`.
-- Adding the current user to the `docker` group requires re-login to take effect.
-- The installer assumes network access and will fail where connectivity or DNS is blocked.
-- The script does not currently handle SELinux-specific steps on systems where SELinux is enforcing.
+Limitações e observações
+- Nomes de pacotes variam entre distribuições; `resolve_pkg_name` fornece mapeamentos básicos, mas pode ser necessário ajustar manualmente para alguns pacotes.
+- O instalador do Go prefere o pacote da distro; quando ausente, baixa um tarball e instala em `/usr/local/go`.
+- Adicionar o usuário atual ao grupo `docker` requer logout/login para surtir efeito.
+- O instalador pressupõe acesso à rede e falhará em ambientes sem conectividade ou com DNS bloqueado.
+- O script não trata especificamente sistemas com SELinux em modo enforcing.
 
-Troubleshooting
-- Inspect the log at `$XDG_CACHE_HOME or ~/.cache/workflow/install.log` for details.
-- Use `./install.sh --dry-run` to preview changes before applying them.
+Solução de problemas
+- Verifique o log em `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log` para detalhes.
+- Use `./install.sh --dry-run` para visualizar as alterações antes de aplicá-las.
 
-If you want, I can also create a `CHANGELOG.md` or a simple `Makefile`/`task` helper to run specific modules (e.g., only Docker or only fonts).
+Se quiser, posso também criar um `CHANGELOG.md` ou um `Makefile` simples com alvos por módulo (por exemplo, `make docker` ou `make fonts`).
