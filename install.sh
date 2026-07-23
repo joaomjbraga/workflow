@@ -45,6 +45,7 @@ source "$SCRIPTS_DIR/fonts.sh"
 source "$SCRIPTS_DIR/android.sh"
 source "$SCRIPTS_DIR/applications.sh"
 source "$SCRIPTS_DIR/logging.sh" || true
+source "$SCRIPTS_DIR/snap.sh" || true
 # source arch and go after packages so they can override defaults when needed
 source "$SCRIPTS_DIR/arch.sh" || true
 source "$SCRIPTS_DIR/go.sh" || true
@@ -87,6 +88,9 @@ main() {
     log_info "Applying Arch-specific configuration"
     configure_arch
   fi
+
+  log_info "Checking for snapd and removing if requested"
+  remove_snapd || log_warning "snapd removal failed or skipped"
 
   log_success "Bootstrap completed. Summary:"
   verify_installation

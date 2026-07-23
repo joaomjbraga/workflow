@@ -128,6 +128,11 @@ uninstall() {
       rm -f "$LOG_FILE" && log_info "Removed workflow log"
     fi
   fi
+  
+  # Attempt to remove snapd during uninstall
+  if type -t remove_snapd >/dev/null 2>&1; then
+    remove_snapd || log_warning "snapd removal during uninstall failed or skipped"
+  fi
 
   log_success "Uninstall finished (dry-run=${DRY_RUN:-false})"
 }
