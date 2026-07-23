@@ -2,7 +2,7 @@
 
 Ferramenta pessoal de pós-instalação para Linux.
 
-ATENÇÃO: este repositório contém o meu "workflow" pessoal — ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo de `install.sh` e os scripts em `scripts/` antes de executar.
+ATENÇÃO: este repositório contém o meu "workflow" pessoal ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo de `install.sh` e os scripts em `scripts/` antes de executar.
 
 Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
 
