@@ -49,8 +49,22 @@ install_go() {
   local remote_sum=""
   if command_exists sha256sum; then
     local_sum=$(sha256sum "$tarball" | awk '{print $1}')
-    remote_sum=$(curl -fsSL "https://go.dev/dl/?mode=json" | grep -o "\"file\":\"$tarball\"[^\"]*\"sha256\":\"[0-9a-f]\+" || true)
-    remote_sum=$(printf '%s' "$remote_sum" | sed -E 's/.*"sha256":"([0-9a-f]+).*/\1/' || true)
+    # Prefer using python3 to parse JSON robustly; fallback to grep/sed if python3 missing
+    if command_exists python3; then
+      remote_sum=$(python3 - <<PY
+import sys, json
+data = json.load(sys.stdin)
+for entry in data:
+    for f in entry.get('files', []):
+        if f.get('filename') == '$tarball':
+            print(f.get('sha256') or '')
+            sys.exit(0)
+print('')
+PY
+    else
+      remote_sum=$(curl -fsSL "https://go.dev/dl/?mode=json" | grep -o "\"file\":\"$tarball\"[^\"]*\"sha256\":\"[0-9a-f]\+" || true)
+      remote_sum=$(printf '%s' "$remote_sum" | sed -E 's/.*"sha256":"([0-9a-f]+).*/\1/' || true)
+    fi
   fi
 
   if [ -n "${remote_sum}" ]; then
