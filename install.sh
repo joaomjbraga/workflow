@@ -52,6 +52,7 @@ source "$SCRIPTS_DIR/podman.sh" || true
 # source arch and go after packages so they can override defaults when needed
 source "$SCRIPTS_DIR/arch.sh" || true
 source "$SCRIPTS_DIR/go.sh" || true
+source "$SCRIPTS_DIR/java.sh" || true
 source "$SCRIPTS_DIR/uninstall.sh" || true
 
 main() {
@@ -73,6 +74,9 @@ main() {
 
   log_info "Installing Go (if supported by distro packages or tarball fallback)"
   install_go || log_warning "Go installation failed or not supported"
+
+  log_info "Installing OpenJDK 17"
+  install_java || log_warning "Java installation failed or not supported"
 
   log_info "Installing scrcpy and other applications"
   install_applications

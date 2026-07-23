@@ -8,13 +8,16 @@
 go = "golang"
 docker = "docker.io"
 docker-compose = "docker-compose-plugin"
+openjdk-17-jdk = "openjdk-17-jdk"
 
 [pacman]
 go = "go"
 docker = "docker"
 docker-compose = "docker-compose"
+jdk17-openjdk = "jdk17-openjdk"
 
 [dnf]
 go = "golang"
 docker = "docker"
 docker-compose = "docker-compose-plugin"
+java-17-openjdk-devel = "java-17-openjdk-devel"

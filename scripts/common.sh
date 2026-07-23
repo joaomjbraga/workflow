@@ -122,6 +122,7 @@ verify_installation() {
   fi
   printf "%-20s %s\n" "Docker:" "$(docker --version 2>/dev/null || echo 'not found')"
   printf "%-20s %s\n" "Go:" "$(go version 2>/dev/null || echo 'not found')"
+  printf "%-20s %s\n" "Java:" "$(java -version 2>&1 | head -n1 || echo 'not found')"
   printf "%-20s %s\n" "scrcpy:" "$(scrcpy --version 2>/dev/null || echo 'not found')"
   printf "%-20s %s\n" "Starship:" "$(starship --version 2>/dev/null || echo 'not found')"
   if command_exists flatpak; then
