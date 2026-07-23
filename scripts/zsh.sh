@@ -45,6 +45,13 @@ configure_zsh() {
     cp "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../config/zshrc" "$target"
   fi
 
+  # Remove legacy bindkeys that trigger zsh-syntax-highlighting warnings.
+  sed -i.bak '/up-line-or-beginning-search/d; /down-line-or-beginning-search/d' "$target" 2>/dev/null || true
+
+  # Ensure safe history navigation bindings are present.
+  grep -q "history-beginning-search-backward" "$target" || printf "bindkey '^[[A' history-beginning-search-backward\n" >>"$target"
+  grep -q "history-beginning-search-forward" "$target" || printf "bindkey '^[[B' history-beginning-search-forward\n" >>"$target"
+
   # Ensure plugin load lines exist (syntax highlighting last)
   grep -q "zsh-autosuggestions" "$target" || printf "source %s/zsh-autosuggestions/zsh-autosuggestions.zsh\n" "$plugin_dir" >>"$target"
   grep -q "zsh-syntax-highlighting" "$target" || printf "source %s/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh\n" "$plugin_dir" >>"$target"
