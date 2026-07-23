@@ -46,6 +46,7 @@ source "$SCRIPTS_DIR/android.sh"
 source "$SCRIPTS_DIR/applications.sh"
 source "$SCRIPTS_DIR/logging.sh" || true
 source "$SCRIPTS_DIR/snap.sh" || true
+source "$SCRIPTS_DIR/vscode.sh" || true
 # source arch and go after packages so they can override defaults when needed
 source "$SCRIPTS_DIR/arch.sh" || true
 source "$SCRIPTS_DIR/go.sh" || true
@@ -101,6 +102,12 @@ main() {
 # If user requested uninstall
 if [ "${1:-}" = "uninstall" ] || [ "${1:-}" = "--undo" ]; then
   uninstall
+  exit 0
+fi
+
+# If user requested only VS Code
+if [ "${1:-}" = "vscode" ]; then
+  install_vscode
   exit 0
 fi
 

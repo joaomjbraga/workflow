@@ -3,6 +3,8 @@ INSTALL := ./install.sh
 
 .PHONY: all docker fonts zsh node go applications uninstall dry-run
 
+.PHONY: vscode
+
 all: $(INSTALL)
 	$(INSTALL)
 
@@ -32,3 +34,6 @@ uninstall:
 
 apply:
 	$(INSTALL) --yes
+
+vscode:
+	$(INSTALL) --yes vscode
