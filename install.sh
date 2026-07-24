@@ -47,6 +47,7 @@ source "$SCRIPTS_DIR/applications.sh"
 source "$SCRIPTS_DIR/logging.sh" || true
 source "$SCRIPTS_DIR/snap.sh" || true
 source "$SCRIPTS_DIR/vscode.sh" || true
+source "$SCRIPTS_DIR/chrome.sh" || true
 source "$SCRIPTS_DIR/git.sh" || true
 source "$SCRIPTS_DIR/podman.sh" || true
 # source arch and go after packages so they can override defaults when needed
@@ -96,6 +97,9 @@ main() {
 
   log_info "Installing Visual Studio Code (stable)"
   install_vscode || log_warning "VS Code installation failed or skipped"
+
+  log_info "Installing Google Chrome (stable)"
+  install_chrome || log_warning "Google Chrome installation failed or skipped"
 
   if [[ "$PKG_MANAGER" == "pacman" ]]; then
     log_info "Applying Arch-specific configuration"
