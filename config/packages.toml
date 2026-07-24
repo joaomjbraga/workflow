@@ -1,13 +1,12 @@
 # Package overrides per package manager.
+# Docker packages are installed from official Docker repository.
+# See docker.sh for the actual installation process.
 # Example:
 # [apt]
 # go = "golang"
-# docker = "docker.io"
 
 [apt]
 go = "golang"
-docker = "docker.io"
-docker-compose = "docker-compose-plugin"
 openjdk-17-jdk = "openjdk-17-jdk"
 
 [pacman]
@@ -18,6 +17,4 @@ jdk17-openjdk = "jdk17-openjdk"
 
 [dnf]
 go = "golang"
-docker = "docker"
-docker-compose = "docker-compose-plugin"
 java-17-openjdk-devel = "java-17-openjdk-devel"
