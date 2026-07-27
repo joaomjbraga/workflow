@@ -16,7 +16,7 @@ install_fonts() {
   mkdir -p "$dest_dir"
 
   if [ -z "$src_dir" ] || [ ! -d "$src_dir" ]; then
-    log_info "No font/ or fonts/ directory found in project; skipping fonts"
+    log_info "Diretório font/ ou fonts/ não encontrado; ignorando fontes"
     return 0
   fi
 
@@ -26,15 +26,15 @@ install_fonts() {
     [ -e "$f" ] || continue
     local base="$(basename "$f")"
     if [ -e "$dest_dir/$base" ]; then
-      log_info "Font $base already exists; skipping"
+      log_info "Fonte $base já existe; ignorando"
     else
       if [ "${DRY_RUN:-false}" = "true" ]; then
-        log_info "[DRY RUN] Would copy font $base to $dest_dir"
+        log_info "[SIMULAÇÃO] Copiaria fonte $base para $dest_dir"
         copied=$((copied + 1))
       else
         cp "$f" "$dest_dir/"
         copied=$((copied + 1))
-        log_info "Copied font $base"
+        log_info "Fonte $base copiada"
       fi
     fi
   done
@@ -42,9 +42,9 @@ install_fonts() {
 
   if command_exists fc-cache && [ "$copied" -gt 0 ]; then
     if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would run fc-cache -f"
+      log_info "[SIMULAÇÃO] Executaria fc-cache -f"
     else
-      fc-cache -f || log_warning "fc-cache failed"
+      fc-cache -f || log_warning "fc-cache falhou"
     fi
   fi
 }

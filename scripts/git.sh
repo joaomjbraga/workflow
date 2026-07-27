@@ -3,30 +3,28 @@ set -Eeuo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 configure_git() {
-  log_info "Configuring Git (user.name and user.email)"
+  log_info "Configurando Git (user.name e user.email)"
 
-  # Ensure git is installed
   if ! command_exists git; then
-    log_info "git not found"
+    log_info "git não encontrado"
     if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would install git"
+      log_info "[SIMULAÇÃO] Instalaria git"
     else
       if [ "${AUTO_YES:-false}" = "true" ]; then
-        install_package git || log_warning "Failed to install git"
+        install_package git || log_warning "Falha ao instalar git"
       else
-        read -rp "git não encontrado. Deseja instalar git agora? [Y/n]: " ans
-        ans="${ans:-Y}"
-        if [[ "$ans" =~ ^[Yy] ]]; then
-          install_package git || log_warning "Failed to install git"
+        read -rp "git não encontrado. Deseja instalar git agora? [S/n]: " ans
+        ans="${ans:-S}"
+        if [[ "$ans" =~ ^[SsYy]$ ]]; then
+          install_package git || log_warning "Falha ao instalar git"
         else
-          log_warning "git não instalado; abortando configuração de usuário"
+          log_warning "git não instalado; abortando configuração do usuário"
           return 1
         fi
       fi
     fi
   fi
 
-  # Gather existing values
   local cur_name cur_email
   cur_name=$(git config --global user.name 2>/dev/null || true)
   cur_email=$(git config --global user.email 2>/dev/null || true)
@@ -43,22 +41,22 @@ configure_git() {
   fi
 
   if [ -z "$name" ] || [ -z "$email" ]; then
-    log_warning "Nome ou email não fornecido; pulando configuração de ~/.gitconfig"
+    log_warning "Nome ou email não fornecidos; pulando configuração de ~/.gitconfig"
     return 1
   fi
 
   local gitcfg="$HOME/.gitconfig"
   if [ -f "$gitcfg" ]; then
     if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would backup existing $gitcfg to $gitcfg.bak"
+      log_info "[SIMULAÇÃO] Faria backup de $gitcfg para $gitcfg.bak"
     else
       cp "$gitcfg" "$gitcfg.bak" || true
-      log_info "Backed up existing $gitcfg to $gitcfg.bak"
+      log_info "Backup de $gitcfg salvo em $gitcfg.bak"
     fi
   fi
 
   if [ "${DRY_RUN:-false}" = "true" ]; then
-    log_info "[DRY RUN] Would write new $gitcfg with name=$name email=$email"
+    log_info "[SIMULAÇÃO] Escreveria novo $gitcfg com name=$name email=$email"
   else
     cat > "$gitcfg" <<EOF
 [user]
@@ -72,21 +70,19 @@ configure_git() {
 	helper =
 	helper = !/usr/bin/gh auth git-credential
 EOF
-    log_success "Wrote $gitcfg"
+    log_success "$gitcfg escrito"
   fi
 
-  # Also configure via git config --global for immediate effect
   if [ "${DRY_RUN:-false}" = "true" ]; then
-    log_info "[DRY RUN] Would run: git config --global user.name \"$name\""
-    log_info "[DRY RUN] Would run: git config --global user.email \"$email\""
+    log_info "[SIMULAÇÃO] Executaria: git config --global user.name \"$name\""
+    log_info "[SIMULAÇÃO] Executaria: git config --global user.email \"$email\""
   else
     git config --global user.name "$name"
     git config --global user.email "$email"
     git config --global init.defaultBranch main
-    # add credential helper entries
     git config --global --add credential.https://github.com.helper ""
     git config --global --add credential.https://github.com.helper "!/usr/bin/gh auth git-credential"
-    log_success "Configured git global user and credential helper"
+    log_success "Configuração global do git e helper de credenciais definidos"
   fi
 }
 

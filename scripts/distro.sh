@@ -22,11 +22,11 @@ detect_distro() {
       PKG_MANAGER="dnf"
       ;;
     *)
-      log_error "Unsupported distribution: $DISTRO_NAME ($DISTRO_ID)"
+      log_error "Distribuição não suportada: $DISTRO_NAME ($DISTRO_ID)"
       exit 1
       ;;
   esac
 
   export DISTRO_ID DISTRO_NAME PKG_MANAGER
-  log_info "Detected distro: $DISTRO_NAME ($DISTRO_ID), package manager: $PKG_MANAGER"
+  log_info "Distribuição detectada: $DISTRO_NAME ($DISTRO_ID), gerenciador de pacotes: $PKG_MANAGER"
 }

@@ -1,44 +1,35 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
-# source docker helpers to allow reconfiguration
-if [ -f "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker.sh" ]; then
-  # shellcheck disable=SC1090
-  source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker.sh"
-fi
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/docker.sh"
 
-# Detect and remove podman safely. Respects DRY_RUN and AUTO_YES.
 remove_podman() {
   if ! command_exists podman; then
-    log_info "podman not present"
+    log_info "podman não está presente"
     return 0
   fi
 
-  log_info "podman detected on system"
+  log_info "podman detectado no sistema"
   if [ "${DRY_RUN:-false}" = "true" ]; then
-    log_info "[DRY RUN] Would remove podman and cleanup containers/images/volumes"
+    log_info "[SIMULAÇÃO] Removeria podman e limparia containers/imagens/volumes"
     return 0
   fi
 
-  # Confirm interactively even if --yes; skip prompt if non-interactive (no TTY)
   if [ -t 0 ]; then
-    read -rp "Confirm removal of podman and all its containers/images (this is irreversible)? [y/N]: " confirm
-    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
-      log_info "User declined podman removal"
+    read -rp "Confirmar remoção do podman e de todos os seus containers/imagens (isso é irreversível)? [s/N]: " confirm
+    if [[ ! "$confirm" =~ ^[SsYy]$ ]]; then
+      log_info "Usuário recusou a remoção do podman"
       return 0
     fi
   else
     if [ "${AUTO_YES:-false}" != "true" ]; then
-      log_info "Non-interactive shell and --yes not provided; skipping podman removal"
+      log_info "Shell não-interativo e --yes não fornecido; ignorando remoção do podman"
       return 0
     fi
-    # In non-interactive + AUTO_YES, proceed without prompt
   fi
 
-  # Stop services
   run_as_root systemctl stop podman.socket podman.service || true
 
-  # Remove all containers/images/volumes (best-effort)
   if command_exists podman; then
     run_as_root podman ps -a -q | xargs -r -n1 podman rm -f || true
     run_as_root podman images -q | xargs -r -n1 podman rmi -f || true
@@ -59,43 +50,41 @@ remove_podman() {
       run_as_root rm -rf /var/lib/containers /var/lib/podman || true
       ;;
     *)
-      log_warning "Unknown package manager; please remove podman manually"
+      log_warning "Gerenciador de pacotes desconhecido; remova o podman manualmente"
       ;;
   esac
 
   run_as_root systemctl disable --now podman.socket podman.service || true
   run_as_root systemctl daemon-reload || true
-  log_success "podman removal complete (or simulated)"
+  log_success "Remoção do podman concluída (ou simulada)"
 
-  # Ensure Docker is installed and running (user prefers Docker)
   if ! command_exists docker; then
-    log_info "Docker not found; installing Docker to replace Podman"
+    log_info "Docker não encontrado; instalando Docker para substituir o Podman"
     if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] Would install docker via $PKG_MANAGER"
+      log_info "[SIMULAÇÃO] Instalaria docker via $PKG_MANAGER"
     else
-      install_package docker || log_warning "Failed to install docker"
+      install_package docker || log_warning "Falha ao instalar docker"
     fi
   fi
 
   if command_exists docker; then
-    log_info "Enabling and starting Docker service"
+    log_info "Habilitando e iniciando serviço Docker"
     if [ "${DRY_RUN:-false}" = "true" ]; then
-      log_info "[DRY RUN] sudo systemctl enable --now docker"
+      log_info "[SIMULAÇÃO] sudo systemctl enable --now docker"
     else
-      run_as_root systemctl enable --now docker || log_warning "Failed to enable/start docker"
+      run_as_root systemctl enable --now docker || log_warning "Falha ao habilitar/iniciar docker"
     fi
 
-    # Add user to docker group if possible
     TARGET_USER="${SUDO_USER:-${USER:-}}"
     if [ -z "$TARGET_USER" ]; then
       TARGET_USER=$(logname 2>/dev/null || id -un 2>/dev/null || echo "")
     fi
     if [ -n "$TARGET_USER" ]; then
       if [ "${DRY_RUN:-false}" = "true" ]; then
-        log_info "[DRY RUN] Would add $TARGET_USER to docker group"
+        log_info "[SIMULAÇÃO] Adicionaria $TARGET_USER ao grupo docker"
       else
-        run_as_root usermod -aG docker "$TARGET_USER" || log_warning "Could not add $TARGET_USER to docker group"
-        log_info "Added $TARGET_USER to docker group (may require relogin)"
+        run_as_root usermod -aG docker "$TARGET_USER" || log_warning "Não foi possível adicionar $TARGET_USER ao grupo docker"
+        log_info "Usuário $TARGET_USER adicionado ao grupo docker (pode ser necessário fazer logout)"
       fi
     fi
   fi

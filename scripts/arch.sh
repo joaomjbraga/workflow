@@ -4,12 +4,12 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 configure_arch() {
   if [ "$PKG_MANAGER" != "pacman" ]; then
-    log_warning "configure_arch called on non-Arch system"
+    log_warning "configure_arch chamado em sistema não-Arch"
     return 0
   fi
 
-  log_info "Enabling fstrim.timer"
-  run_as_root systemctl enable fstrim.timer --now || log_warning "Could not enable fstrim.timer"
+  log_info "Habilitando fstrim.timer"
+  run_as_root systemctl enable fstrim.timer --now || log_warning "Não foi possível habilitar fstrim.timer"
   run_as_root fstrim / || true
 
   local preset_dir="/etc/systemd/system-preset"
@@ -24,17 +24,16 @@ configure_arch() {
   fi
   run_as_root systemctl preset-all || true
 
-  # yay-bin installation
   if command_exists yay; then
-    log_info "yay already installed"
+    log_info "yay já está instalado"
   else
-    log_info "Installing yay (AUR helper)"
+    log_info "Instalando yay (helper do AUR)"
     install_package git || true
     install_package base-devel || true
     local td
     td=$(temp_dir)
-    git clone https://aur.archlinux.org/yay-bin.git "$td/yay-bin" || { log_warning "Could not clone yay-bin"; return 0; }
-    (cd "$td/yay-bin" && makepkg -si --noconfirm) || log_warning "makepkg for yay failed"
+    git clone https://aur.archlinux.org/yay-bin.git "$td/yay-bin" || { log_warning "Não foi possível clonar yay-bin"; return 0; }
+    (cd "$td/yay-bin" && makepkg -si --noconfirm) || log_warning "makepkg para yay falhou"
     rm -rf "$td"
   fi
 }

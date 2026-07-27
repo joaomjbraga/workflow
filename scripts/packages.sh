@@ -4,11 +4,9 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 resolve_pkg_name() {
   local key="$1"
-  # Allow overrides via config/packages.toml in repo root
   local cfg
   cfg="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/config/packages.toml"
   if [ -f "$cfg" ]; then
-    # extract the relevant section for this package manager
     local section
     section=$(awk -v pm="$PKG_MANAGER" '
       BEGIN{capture=0}
@@ -16,7 +14,6 @@ resolve_pkg_name() {
       capture==1 {print}
     ' "$cfg" || true)
     if [ -n "$section" ]; then
-      # try to find key = "value" or key = value
       local val
       val=$(printf '%s' "$section" | sed -n -E 's/^[[:space:]]*'"$key"'[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' || true)
       if [ -z "$val" ]; then
@@ -86,15 +83,13 @@ install_base_dependencies() {
     else
       resolved="$p"
     fi
-    log_info "Ensuring package: $resolved"
-    install_package "$resolved" || log_warning "Failed to install $resolved"
+    log_info "Garantindo pacote: $resolved"
+    install_package "$resolved" || log_warning "Falha ao instalar $resolved"
   done
 
-  # Ensure flatpak remote exists when flatpak is available
   if command_exists flatpak; then
     run_as_root flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
 
-    # If systemd is present, enable Flatpak-related services if available
     if [ -d "/run/systemd/system" ] && command -v systemctl >/dev/null 2>&1; then
       for unit in flatpak.service flatpak-system-helper.service; do
         if systemctl list-unit-files | grep -q "^${unit}"; then
@@ -106,7 +101,6 @@ install_base_dependencies() {
 }
 
 install_go() {
-  # Prefer distro package if available
   case "$PKG_MANAGER" in
     pacman)
       install_package go

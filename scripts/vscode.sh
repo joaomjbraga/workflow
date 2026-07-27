@@ -4,33 +4,31 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 install_vscode() {
   if command_exists code; then
-    log_info "Visual Studio Code already installed"
+    log_info "Visual Studio Code já está instalado"
     return 0
   fi
 
-  log_info "Installing Visual Studio Code (stable)"
+  log_info "Instalando Visual Studio Code (stable)"
 
   if [ "${DRY_RUN:-false}" = "true" ]; then
-    log_info "[DRY RUN] Would install VS Code for $PKG_MANAGER"
+    log_info "[SIMULAÇÃO] Instalaria VS Code para $PKG_MANAGER"
     return 0
   fi
 
   case "$PKG_MANAGER" in
     apt)
-      # Add Microsoft apt repo and install
       if [ ! -f /usr/share/keyrings/microsoft.gpg ]; then
         run_as_root bash -c 'curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft.gpg'
       fi
       run_as_root bash -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
       run_as_root apt-get update -y || true
       if [ "${AUTO_YES:-false}" = "true" ]; then
-        run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y code || log_warning "Failed to install code via apt"
+        run_as_root env DEBIAN_FRONTEND=noninteractive apt-get install -y code || log_warning "Falha ao instalar code via apt"
       else
-        run_as_root apt-get install -y code || log_warning "Failed to install code via apt"
+        run_as_root apt-get install -y code || log_warning "Falha ao instalar code via apt"
       fi
       ;;
     dnf)
-      # Add repo and install
       run_as_root rpm --import https://packages.microsoft.com/keys/microsoft.asc || true
       run_as_root bash -c 'cat > /etc/yum.repos.d/vscode.repo <<"EOF"
 [code]
@@ -41,49 +39,47 @@ gpgcheck=1
 gpgkey=https://packages.microsoft.com/keys/microsoft.asc
 EOF'
       run_as_root dnf check-update || true
-      run_as_root dnf install -y code || log_warning "Failed to install code via dnf"
+      run_as_root dnf install -y code || log_warning "Falha ao instalar code via dnf"
       ;;
     pacman)
-      # Prefer AUR package visual-studio-code-bin via yay/paru
       if command_exists yay; then
         if [ "${DRY_RUN:-false}" = "true" ]; then
-          log_info "[DRY RUN] Would run: yay -S --noconfirm visual-studio-code-bin"
+          log_info "[SIMULAÇÃO] Executaria: yay -S --noconfirm visual-studio-code-bin"
         else
-          run_as_root yay -S --noconfirm visual-studio-code-bin || log_warning "Failed to install visual-studio-code-bin via yay"
+          run_as_root yay -S --noconfirm visual-studio-code-bin || log_warning "Falha ao instalar visual-studio-code-bin via yay"
         fi
       elif command_exists paru; then
         if [ "${DRY_RUN:-false}" = "true" ]; then
-          log_info "[DRY RUN] Would run: paru -S --noconfirm visual-studio-code-bin"
+          log_info "[SIMULAÇÃO] Executaria: paru -S --noconfirm visual-studio-code-bin"
         else
-          run_as_root paru -S --noconfirm visual-studio-code-bin || log_warning "Failed to install visual-studio-code-bin via paru"
+          run_as_root paru -S --noconfirm visual-studio-code-bin || log_warning "Falha ao instalar visual-studio-code-bin via paru"
         fi
       else
-        log_info "No AUR helper found; attempting manual AUR build of visual-studio-code-bin"
+        log_info "Nenhum helper AUR encontrado; tentando build manual do AUR para visual-studio-code-bin"
         if [ "${DRY_RUN:-false}" = "true" ]; then
-          log_info "[DRY RUN] Would git clone https://aur.archlinux.org/visual-studio-code-bin.git and run makepkg --verify && makepkg -si --noconfirm"
+          log_info "[SIMULAÇÃO] Clonaria https://aur.archlinux.org/visual-studio-code-bin.git e executaria makepkg --verify && makepkg -si --noconfirm"
         else
           tmpd=$(temp_dir)
-          git clone https://aur.archlinux.org/visual-studio-code-bin.git "$tmpd/visual-studio-code-bin" || { log_warning "Failed to clone AUR repo"; rm -rf "$tmpd"; return 1; }
+          git clone https://aur.archlinux.org/visual-studio-code-bin.git "$tmpd/visual-studio-code-bin" || { log_warning "Falha ao clonar repositório AUR"; rm -rf "$tmpd"; return 1; }
           pushd "$tmpd/visual-studio-code-bin" >/dev/null
-          # verify sources/checksums if possible
           if command_exists makepkg; then
-            log_info "Running makepkg --verify to validate sources"
+            log_info "Executando makepkg --verify para validar fontes"
             if ! makepkg --verify; then
-              log_error "makepkg --verify failed; aborting AUR build/install"
+              log_error "makepkg --verify falhou; abortando build/instalação AUR"
               popd >/dev/null
               rm -rf "$tmpd"
               return 1
             fi
-            log_info "makepkg --verify passed"
-            log_info "Building and installing package via makepkg -si --noconfirm"
+            log_info "makepkg --verify passou"
+            log_info "Compilando e instalando pacote via makepkg -si --noconfirm"
             if ! run_as_root makepkg -si --noconfirm; then
-              log_error "makepkg build/install failed"
+              log_error "makepkg build/install falhou"
               popd >/dev/null
               rm -rf "$tmpd"
               return 1
             fi
           else
-            log_warning "makepkg not available; please install base-devel or use an AUR helper"
+            log_warning "makepkg não disponível; instale base-devel ou use um helper AUR"
           fi
           popd >/dev/null
           rm -rf "$tmpd"
@@ -91,7 +87,7 @@ EOF'
       fi
       ;;
     *)
-      log_warning "Unsupported package manager for automatic VS Code install: $PKG_MANAGER"
+      log_warning "Gerenciador de pacotes não suportado para instalação automática do VS Code: $PKG_MANAGER"
       ;;
   esac
 }

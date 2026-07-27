@@ -6,5 +6,6 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 install_applications() {
   # Glowkey
-  # Glowkey intentionally removed from installer; it's managed separately by the user.
+  # Glowkey intencionalmente removido do instalador; é gerenciado separadamente pelo usuário.
+  return 0
 }
