@@ -79,7 +79,7 @@ main() {
   log_info "Installing OpenJDK 17"
   install_java || log_warning "Java installation failed or not supported"
 
-  log_info "Installing scrcpy and other applications"
+  log_info "Installing applications"
   install_applications
 
   log_info "Installing NVM and Node.js"
