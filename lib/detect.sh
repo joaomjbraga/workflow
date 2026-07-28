@@ -12,21 +12,16 @@ detect_distro() {
   fi
 
   case "$DISTRO_ID" in
-    debian|ubuntu|linuxmint|pop)
-      PKG_MANAGER="apt"
-      ;;
     arch|manjaro)
       PKG_MANAGER="pacman"
       ;;
-    fedora)
-      PKG_MANAGER="dnf"
-      ;;
     *)
       log_error "Distribuição não suportada: $DISTRO_NAME ($DISTRO_ID)"
+      log_error "Por enquanto apenas Arch Linux e derivados são suportados."
       exit 1
       ;;
   esac
 
   export DISTRO_ID DISTRO_NAME PKG_MANAGER
-  log_info "Distribuição detectada: $DISTRO_NAME ($DISTRO_ID), gerenciador de pacotes: $PKG_MANAGER"
+  log_info "Distribuição detectada: $DISTRO_NAME ($DISTRO_ID)"
 }

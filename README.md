@@ -2,7 +2,7 @@
 
 Ferramenta pessoal de pós-instalação para Linux.
 
-ATENÇÃO: este repositório contém o meu "workflow" pessoal. Ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo de `install.sh` e os scripts em `scripts/` antes de executar.
+ATENÇÃO: este repositório contém o meu "workflow" pessoal. Ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo antes de executar.
 
 Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
 
@@ -19,7 +19,7 @@ chmod +x install.sh
 ```bash
 ./install.sh              # instalação completa (interativa)
 ./install.sh --dry-run    # simula sem fazer alterações
-./install.sh --yes        # modo não-interativo (permite remoções de podman/snapd)
+./install.sh --yes        # modo não-interativo
 ./install.sh uninstall    # reverte a instalação
 ./install.sh vscode       # instala apenas o VS Code
 ./install.sh git-config   # configura o Git interativamente
@@ -37,42 +37,82 @@ make git-config   # configura o Git
 
 ## Logs
 
-Os logs são gravados em: `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log`.
+Os logs são gravados em: `$XDG_CACHE_HOME/workflow/install.log` (padrão `~/.cache/workflow/install.log`).
 
 ## Fontes
 
 Coloque arquivos `.ttf` ou `.otf` nas pastas `font/` ou `fonts/` na raiz do repositório; eles serão copiados para `~/.local/share/`.
 
-## Estrutura modular
+## Estrutura
 
-Veja os diretórios `scripts/` e `config/` para a implementação modular. O instalador é idempotente e pode ser executado repetidas vezes com segurança.
+```
+install.sh        → Entry point: detecta a distribuição e carrega o workflow
+lib/              → Framework compartilhado entre distribuições
+├── core.sh       → Utilitários (logging, sudo, pacotes)
+└── detect.sh     → Detecção da distribuição
+workflows/        → Workflows específicos por distribuição
+└── arch/         → Workflow Arch Linux
+    ├── main.sh   → Orquestrador (ordem dos passos)
+    ├── packages.sh   → Pacotes base + yay (helper AUR)
+    ├── docker.sh     → Docker
+    ├── node.sh       → NVM + Node.js
+    ├── zsh.sh        → Starship + Zsh + plugins
+    ├── fonts.sh      → Fontes
+    ├── android.sh    → Android Studio (Flatpak)
+    ├── vscode.sh     → VS Code (AUR)
+    ├── chrome.sh     → Google Chrome (AUR)
+    ├── go.sh         → Go
+    ├── java.sh       → OpenJDK 17
+    ├── git.sh        → Configuração do Git
+    ├── tweaks.sh     → Ajustes específicos (fstrim)
+    └── uninstall.sh  → Reversão completa
+config/           → Configurações compartilhadas
+├── starship.toml
+├── zshrc
+├── bashrc
+└── logrotate/workflow
+fonts/            → Fontes .ttf/.otf
+```
 
-## O que foi implementado
+## O que é instalado
 
-- Detecção de distribuição (`/etc/os-release`) e mapeamento de gerenciador de pacotes para `apt`, `pacman` e `dnf`.
-- Instalação idempotente de pacotes com resolução de nomes por distribuição.
-- Instaladores para: Docker (e gestão de grupo), NVM + Node.js (v22), Go (pacote da distro ou fallback por tarball), OpenJDK 17, Starship, Zsh (com plugins), VS Code, Google Chrome e Android Studio (via Flatpak).
-- Cópia de fontes de `font/` ou `fonts/` para `~/.local/share/` (suporta `.ttf` e `.otf`).
-- Algumas ferramentas (por exemplo, projetos pessoais como "Glowkey") são gerenciadas fora deste instalador e não serão instaladas automaticamente; instale-as manualmente quando desejar.
-- Tarefas específicas do Arch: habilitação de `fstrim.timer` e instalação de `yay-bin` via AUR (diretório temporário para build).
-- Instalação e remoção de `snapd` e `podman` (o instalador remove o podman e instala o Docker no lugar).
+- **Base:** curl, wget, git, zsh, unzip, flatpak, base-devel
+- **yay** (helper AUR)
+- **Docker + Docker Compose**
+- **Go** (pacote oficial)
+- **OpenJDK 17**
+- **NVM + Node.js 22**
+- **Starship** + Zsh com plugins (autosuggestions, syntax-highlighting)
+- **Fontes** (Nerd Fonts)
+- **Android Studio** (Flatpak)
+- **Visual Studio Code** (AUR)
+- **Google Chrome** (AUR)
+- **Configuração Git** (interativa)
+- **fstrim.timer** (Arch)
 
 ## Segurança e idempotência
 
 - Os scripts verificam se comandos e pacotes já existem antes de instalar.
-- `install.sh --dry-run` simula todas as etapas e mostra o que seria executado sem alterar o sistema.
+- `install.sh --dry-run` simula todas as etapas sem alterar o sistema.
 - Operações que exigem privilégios usam `sudo` apenas quando necessário.
-- O instalador pode remover componentes do sistema (ex.: `podman`, `snapd`) quando executado com `--yes`. Use `--dry-run` para revisar ações antes de aplicar.
+
+## Suporte a distribuições
+
+Atualmente apenas **Arch Linux** (e derivados como Manjaro) são suportados.
+
+Para adicionar uma nova distribuição:
+1. Crie `workflows/<distro>/main.sh`
+2. Implemente os passos específicos (pacotes, docker, vscode, etc.)
+3. Adicione a detecção em `lib/detect.sh`
 
 ## Limitações e observações
 
-- Nomes de pacotes variam entre distribuições; `resolve_pkg_name` fornece mapeamentos básicos, mas pode ser necessário ajustar manualmente para alguns pacotes.
-- O instalador do Go prefere o pacote da distro; quando ausente, baixa um tarball e instala em `/usr/local/go`.
+- O instalador requer acesso à rede para downloads e clones via `git`.
+- A compilação via AUR para `yay-bin` requer `makepkg` e as ferramentas de `base-devel`.
+- O script utiliza `sudo` para operações privilegiadas.
 - Adicionar o usuário atual ao grupo `docker` requer logout/login para surtir efeito.
-- O instalador pressupõe acesso à rede e falhará em ambientes sem conectividade ou com DNS bloqueado.
-- O script não trata especificamente sistemas com SELinux em modo enforcing.
 
 ## Solução de problemas
 
-- Verifique o log em `$XDG_CACHE_HOME` ou `~/.cache/workflow/install.log` para detalhes.
+- Verifique o log em `$XDG_CACHE_HOME/workflow/install.log` para detalhes.
 - Use `./install.sh --dry-run` para visualizar as alterações antes de aplicá-las.

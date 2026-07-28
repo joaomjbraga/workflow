@@ -3,7 +3,7 @@ INSTALL := ./install.sh
 
 .PHONY: all dry-run apply uninstall vscode git-config
 
-all: $(INSTALL)
+all:
 	$(INSTALL)
 
 dry-run:

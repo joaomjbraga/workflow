@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 install_java() {
   if command_exists java; then
@@ -13,7 +12,7 @@ install_java() {
   fi
 
   log_info "Instalando OpenJDK 17"
-  install_package openjdk-17-jdk || log_warning "Falha ao instalar OpenJDK 17"
+  install_package jdk17-openjdk || log_warning "Falha ao instalar OpenJDK 17"
 
   if command_exists java; then
     log_success "OpenJDK 17 instalado com sucesso"
@@ -23,5 +22,3 @@ install_java() {
     return 1
   fi
 }
-
-export -f install_java

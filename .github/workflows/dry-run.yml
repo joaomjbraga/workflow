@@ -5,35 +5,16 @@ on:
   pull_request:
 
 jobs:
-  dry-run-hosted:
+  dry-run:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Run install.sh (dry-run)
-        run: |
-          chmod +x ./install.sh
-          ./install.sh --dry-run --yes
-
-  dry-run-containers:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        include:
-          - distro: arch
-            container_image: archlinux:latest
-            prepare: pacman -Syu --noconfirm bash git curl ca-certificates || true
-          - distro: fedora
-            container_image: fedora:latest
-            prepare: dnf install -y git curl ca-certificates || true
-
     container:
-      image: ${{ matrix.container_image }}
-
+      image: archlinux:latest
     steps:
       - uses: actions/checkout@v4
       - name: Prepare container
-        run: ${{ matrix.prepare }}
-      - name: Run install.sh (dry-run) on ${{ matrix.distro }} container
+        run: |
+          pacman -Syu --noconfirm bash git curl ca-certificates
+      - name: Run install.sh (dry-run)
         run: |
           chmod +x ./install.sh
           ./install.sh --dry-run --yes

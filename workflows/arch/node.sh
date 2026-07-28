@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/common.sh"
 
 install_nvm_and_node() {
-  if [ "${DRY_RUN:-false}" = "true" ]; then
+  if [ "$DRY_RUN" = "true" ]; then
     if [ -d "$HOME/.nvm" ] || command_exists nvm; then
       log_info "NVM já está instalado"
     else
@@ -31,5 +30,3 @@ install_nvm_and_node() {
 
   log_info "Node: $(node --version 2>/dev/null || echo 'não encontrado')"
 }
-
-export -f install_nvm_and_node
