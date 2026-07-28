@@ -58,7 +58,7 @@ workflows/        → Workflows específicos por distribuição
     ├── node.sh       → NVM + Node.js
     ├── zsh.sh        → Starship + Zsh + plugins
     ├── fonts.sh      → Fontes
-    ├── android.sh    → Android Studio (Flatpak)
+    ├── android.sh    → Android Studio (AUR)
     ├── vscode.sh     → VS Code (AUR)
     ├── chrome.sh     → Google Chrome (AUR)
     ├── go.sh         → Go
@@ -78,13 +78,13 @@ fonts/            → Fontes .ttf/.otf
 
 - **Base:** curl, wget, git, zsh, unzip, flatpak, base-devel
 - **yay** (helper AUR)
-- **Docker + Docker Compose**
+- **Docker + Docker Compose + Docker Buildx**
 - **Go** (pacote oficial)
 - **OpenJDK 17**
 - **NVM + Node.js 22**
 - **Starship** + Zsh com plugins (autosuggestions, syntax-highlighting)
 - **Fontes** (Nerd Fonts)
-- **Android Studio** (Flatpak)
+- **Android Studio** (AUR)
 - **Visual Studio Code** (AUR)
 - **Google Chrome** (AUR)
 - **Configuração Git** (interativa)
