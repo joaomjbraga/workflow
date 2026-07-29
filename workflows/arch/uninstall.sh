@@ -81,23 +81,30 @@ uninstall() {
     fi
   fi
 
+  if systemctl list-unit-files | grep -q "power-profiles-daemon.service"; then
+    if [ "$DRY_RUN" = "true" ]; then
+      log_info "[SIMULAÇÃO] Desabilitaria e pararia power-profiles-daemon"
+    else
+      run_as_root systemctl disable --now power-profiles-daemon || true
+      log_info "power-profiles-daemon desabilitado"
+    fi
+  fi
+
+  if command_exists powerprofilesctl; then
+    if [ "$DRY_RUN" = "true" ]; then
+      log_info "[SIMULAÇÃO] Removeria power-profiles-daemon"
+    else
+      run_as_root pacman -Rns --noconfirm power-profiles-daemon 2>/dev/null || true
+      log_info "power-profiles-daemon removido"
+    fi
+  fi
+
   if command_exists yay; then
     if [ "$DRY_RUN" = "true" ]; then
       log_info "[SIMULAÇÃO] Removeria pacote yay"
     else
       run_as_root pacman -Rns --noconfirm yay || true
       log_info "yay removido"
-    fi
-  fi
-
-  if command_exists flatpak; then
-    if flatpak list --app | grep -q com.google.AndroidStudio; then
-      if [ "$DRY_RUN" = "true" ]; then
-        log_info "[SIMULAÇÃO] Desinstalaria Android Studio flatpak"
-      else
-        run_as_root flatpak uninstall --delete-data -y com.google.AndroidStudio || true
-        log_info "Android Studio flatpak removido"
-      fi
     fi
   fi
 

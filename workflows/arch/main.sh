@@ -15,6 +15,7 @@ source "$WORKFLOW_DIR/chrome.sh"
 source "$WORKFLOW_DIR/go.sh"
 source "$WORKFLOW_DIR/java.sh"
 source "$WORKFLOW_DIR/git.sh"
+source "$WORKFLOW_DIR/power.sh"
 source "$WORKFLOW_DIR/tweaks.sh"
 source "$WORKFLOW_DIR/uninstall.sh"
 
@@ -59,6 +60,9 @@ main() {
 
   log_info "Aplicando ajustes específicos do Arch"
   arch_tweaks || log_warning "Falha nos ajustes Arch"
+
+  log_info "Instalando Power Profiles Daemon"
+  install_power_profiles || log_warning "Falha ao instalar Power Profiles Daemon"
 
   log_info "Configurando Git"
   configure_git || log_warning "Falha ao configurar Git"

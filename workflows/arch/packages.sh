@@ -2,22 +2,11 @@
 set -Eeuo pipefail
 
 install_base_dependencies() {
-  local pkgs=(base-devel curl wget git zsh unzip ca-certificates flatpak)
+  local pkgs=(base-devel curl wget git zsh unzip ca-certificates)
 
   for p in "${pkgs[@]}"; do
     install_package "$p" || log_warning "Falha ao instalar $p"
   done
-
-  if command_exists flatpak; then
-    run_as_root flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo || true
-    if [ -d "/run/systemd/system" ] && command -v systemctl >/dev/null 2>&1; then
-      for unit in flatpak.service flatpak-system-helper.service; do
-        if systemctl list-unit-files | grep -q "^${unit}"; then
-          run_as_root systemctl enable --now "$unit" || true
-        fi
-      done
-    fi
-  fi
 }
 
 install_yay() {

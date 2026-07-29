@@ -1,118 +1,128 @@
 # workflow
 
-Ferramenta pessoal de pós-instalação para Linux.
+Este é o meu kit de sobrevivência pós-formatação. Depois de instalar o Arch
+limpinho, eu executo esse script e ele monta meu ambiente de desenvolvimento
+do jeito que eu gosto — sem eu ter que lembrar passo a passo toda vez.
 
-ATENÇÃO: este repositório contém o meu "workflow" pessoal. Ele instala e remove ferramentas conforme as minhas preferências pessoais (por exemplo, eu uso Docker e removo `podman`; não uso `snap`/`flatpak` para certos pacotes). Se você pretende usar este script em outro ambiente (como trabalho), revise o conteúdo antes de executar.
+⚠️ **Isso é pessoal.** Esse repositório reflete *minhas* escolhas (por exemplo,
+eu uso Docker, não uso Podman). Se você for usar num ambiente de trabalho,
+leia o código antes — sério, é pouco e tá bem comentado.
 
-Execute `./install.sh` para provisionar um sistema a partir de uma instalação limpa.
+---
 
-## Início rápido
+## Pra começar
 
 ```bash
 chmod +x install.sh
-./install.sh --dry-run   # simula as ações sem fazer alterações
-./install.sh             # executa de fato
+./install.sh --dry-run   # dá uma espiada no que vai rolar
+./install.sh             # bora
 ```
 
-## Uso
+---
+
+## Como usar
 
 ```bash
-./install.sh              # instalação completa (interativa)
-./install.sh --dry-run    # simula sem fazer alterações
-./install.sh --yes        # modo não-interativo
-./install.sh uninstall    # reverte a instalação
-./install.sh vscode       # instala apenas o VS Code
-./install.sh git-config   # configura o Git interativamente
+./install.sh              # instala tudo (modo interativo)
+./install.sh --yes        # instala tudo sem perguntar
+./install.sh --dry-run    # só mostra o que faria
+./install.sh uninstall    # desfaz tudo
+./install.sh vscode       # só o VS Code
+./install.sh git-config   # só configurar Git
 ```
 
-Também disponível via Makefile:
+Também dá pra usar pelo `make`:
 
 ```bash
-make dry-run      # simulação
-make apply        # instalação completa com --yes
-make uninstall    # desinstalação
-make vscode       # instala apenas o VS Code
-make git-config   # configura o Git
+make dry-run      # simular
+make apply        # instalar (modo automático)
+make uninstall    # desinstalar
+make vscode       # só VS Code
+make git-config   # só Git
 ```
+
+---
+
+## O que ele instala
+
+| Categoria | Itens |
+|---|---|
+| **Base** | `curl`, `wget`, `git`, `zsh`, `unzip`, `base-devel` |
+| **AUR helper** | `yay-bin` (compilado na hora) |
+| **Containers** | Docker + Compose + Buildx |
+| **Linguagens** | Go, OpenJDK 17, Node.js 22 (via NVM) |
+| **Terminal** | Starship + Zsh com autosuggestions e syntax-highlighting |
+| **Programas** | VS Code, Android Studio, Google Chrome |
+| **Fontes** | FiraCode Nerd Font e JetBrains Mono |
+| **Extras** | Configuração de Git, `fstrim.timer` pra SSD |
+
+---
 
 ## Logs
 
-Os logs são gravados em: `$XDG_CACHE_HOME/workflow/install.log` (padrão `~/.cache/workflow/install.log`).
-
-## Fontes
-
-Coloque arquivos `.ttf` ou `.otf` nas pastas `font/` ou `fonts/` na raiz do repositório; eles serão copiados para `~/.local/share/`.
-
-## Estrutura
+Tudo que acontece fica registrado em:
 
 ```
-install.sh        → Entry point: detecta a distribuição e carrega o workflow
-lib/              → Framework compartilhado entre distribuições
-├── core.sh       → Utilitários (logging, sudo, pacotes)
-└── detect.sh     → Detecção da distribuição
-workflows/        → Workflows específicos por distribuição
-└── arch/         → Workflow Arch Linux
-    ├── main.sh   → Orquestrador (ordem dos passos)
-    ├── packages.sh   → Pacotes base + yay (helper AUR)
-    ├── docker.sh     → Docker
-    ├── node.sh       → NVM + Node.js
-    ├── zsh.sh        → Starship + Zsh + plugins
-    ├── fonts.sh      → Fontes
-    ├── android.sh    → Android Studio (AUR)
-    ├── vscode.sh     → VS Code (AUR)
-    ├── chrome.sh     → Google Chrome (AUR)
-    ├── go.sh         → Go
-    ├── java.sh       → OpenJDK 17
-    ├── git.sh        → Configuração do Git
-    ├── tweaks.sh     → Ajustes específicos (fstrim)
-    └── uninstall.sh  → Reversão completa
-config/           → Configurações compartilhadas
-├── starship.toml
-├── zshrc
-├── bashrc
-└── logrotate/workflow
-fonts/            → Fontes .ttf/.otf
+~/.cache/workflow/install.log
 ```
 
-## O que é instalado
+Se algo der errado, é pra lá que você olha primeiro.
 
-- **Base:** curl, wget, git, zsh, unzip, flatpak, base-devel
-- **yay** (helper AUR)
-- **Docker + Docker Compose + Docker Buildx**
-- **Go** (pacote oficial)
-- **OpenJDK 17**
-- **NVM + Node.js 22**
-- **Starship** + Zsh com plugins (autosuggestions, syntax-highlighting)
-- **Fontes** (Nerd Fonts)
-- **Android Studio** (AUR)
-- **Visual Studio Code** (AUR)
-- **Google Chrome** (AUR)
-- **Configuração Git** (interativa)
-- **fstrim.timer** (Arch)
+---
+
+## Estrutura do repositório
+
+```
+install.sh              → Ponto de partida
+lib/
+├── core.sh             → Funções compartilhadas (log, sudo, pacotes)
+└── detect.sh           → Descobre qual sistema você tá usando
+workflows/arch/         → Workflow pro Arch (e derivados)
+├── main.sh             → Ordem dos passos
+├── packages.sh         → Pacotes base + yay
+├── docker.sh           → Docker
+├── node.sh             → NVM + Node.js
+├── zsh.sh              → Starship + Zsh + plugins
+├── fonts.sh            → Fontes
+├── android.sh          → Android Studio
+├── vscode.sh           → VS Code
+├── chrome.sh           → Google Chrome
+├── go.sh               → Go
+├── java.sh             → OpenJDK 17
+├── git.sh              → Configurar Git
+├── tweaks.sh           → Ajustes de sistema
+├── power.sh            → Power Profiles Daemon
+└── uninstall.sh        → Reverter tudo
+config/                 → Meus dotfiles
+fonts/                  → Fontes .ttf
+```
+
+---
 
 ## Segurança e idempotência
 
-- Os scripts verificam se comandos e pacotes já existem antes de instalar.
-- `install.sh --dry-run` simula todas as etapas sem alterar o sistema.
-- Operações que exigem privilégios usam `sudo` apenas quando necessário.
+- Cada passo verifica se o bagulho já tá instalado antes de agir. Pode rodar
+  quantas vezes quiser que não quebra nada.
+- O modo `--dry-run` mostra tudo que vai acontecer sem mexer no sistema.
+- Comandos que precisam de `sudo` só pedem senha quando necessário.
 
-## Suporte a distribuições
+---
 
-Atualmente apenas **Arch Linux** (e derivados como Manjaro) são suportados.
+## Funciona em outras distribuições?
 
-Para adicionar uma nova distribuição:
-1. Crie `workflows/<distro>/main.sh`
-2. Implemente os passos específicos (pacotes, docker, vscode, etc.)
-3. Adicione a detecção em `lib/detect.sh`
+Por enquanto, só **Arch Linux** (e derivados tipo Manjaro).
 
-## Limitações e observações
+Se quiser adicionar outra, o esquema é:
 
-- O instalador requer acesso à rede para downloads e clones via `git`.
-- A compilação via AUR para `yay-bin` requer `makepkg` e as ferramentas de `base-devel`.
-- O script utiliza `sudo` para operações privilegiadas.
-- Adicionar o usuário atual ao grupo `docker` requer logout/login para surtir efeito.
+1. Cria `workflows/<distro>/main.sh`
+2. Implementa os passos
+3. Adiciona o detection no `lib/detect.sh`
 
-## Solução de problemas
+Fácil de estender, a arquitetura foi feita pensando nisso.
 
-- Verifique o log em `$XDG_CACHE_HOME/workflow/install.log` para detalhes.
-- Use `./install.sh --dry-run` para visualizar as alterações antes de aplicá-las.
+---
+
+## Dúvidas?
+
+Antes de abrir issue, dá uma olhada no log (`~/.cache/workflow/install.log`)
+e roda o `--dry-run` pra ver se o problema aparece por lá.
