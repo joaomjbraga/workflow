@@ -47,14 +47,13 @@ make git-config   # só Git
 
 | Categoria | Itens |
 |---|---|
-| **Base** | `curl`, `wget`, `git`, `zsh`, `unzip`, `base-devel` |
-| **AUR helper** | `yay-bin` (compilado na hora) |
-| **Containers** | Docker + Compose + Buildx |
+| **Base** | `build-essential`, `curl`, `wget`, `git`, `zsh`, `unzip`, `ca-certificates` |
+| **Containers** | Docker + Compose |
 | **Linguagens** | Go, OpenJDK 17, Node.js 22 (via NVM) |
 | **Terminal** | Starship + Zsh com autosuggestions e syntax-highlighting |
 | **Programas** | VS Code, Android Studio, Google Chrome |
 | **Fontes** | FiraCode Nerd Font e JetBrains Mono |
-| **Extras** | Configuração de Git, `fstrim.timer` pra SSD |
+| **Extras** | Configuração de Git, `fstrim.timer` pra SSD, system76-power |
 
 ---
 
@@ -93,6 +92,21 @@ workflows/arch/         → Workflow pro Arch (e derivados)
 ├── tweaks.sh           → Ajustes de sistema
 ├── power.sh            → Power Profiles Daemon
 └── uninstall.sh        → Reverter tudo
+workflows/pop/          → Workflow pro Pop!_OS
+├── main.sh             → Ordem dos passos
+├── packages.sh         → Pacotes base
+├── docker.sh           → Docker (repositório oficial)
+├── node.sh             → NVM + Node.js
+├── zsh.sh              → Starship + Zsh + plugins
+├── fonts.sh            → Fontes
+├── android.sh          → Android Studio (Flatpak)
+├── vscode.sh           → VS Code
+├── chrome.sh           → Google Chrome
+├── go.sh               → Go
+├── java.sh             → OpenJDK 17
+├── git.sh              → Configurar Git
+├── tweaks.sh           → Ajustes de sistema (sem fstrim)
+└── uninstall.sh        → Reverter tudo
 config/                 → Meus dotfiles
 fonts/                  → Fontes .ttf
 ```
@@ -110,7 +124,7 @@ fonts/                  → Fontes .ttf
 
 ## Funciona em outras distribuições?
 
-Por enquanto, só **Arch Linux** (e derivados tipo Manjaro).
+Por enquanto, **Arch Linux** (e derivados tipo Manjaro) e **Pop!_OS** são suportados.
 
 Se quiser adicionar outra, o esquema é:
 
@@ -121,6 +135,24 @@ Se quiser adicionar outra, o esquema é:
 Fácil de estender, a arquitetura foi feita pensando nisso.
 
 ---
+
+## Notas por distribuição
+
+### Arch Linux
+
+- Usa `pacman` como gerenciador de pacotes
+- `yay-bin` é compilado do AUR para pacotes que não estão nos repositórios oficiais
+- Docker inclui Buildx
+
+### Pop!_OS
+
+- Usa `apt` como gerenciador de pacotes
+- Docker é instalado seguindo a documentação oficial (repositório `docker-ce`)
+- Android Studio é instalado via Flatpak
+- VS Code é instalado via download `.deb` oficial
+- Pacotes como Google Chrome são instalados via `.deb` oficial
+- Flatpak já vem pré-configurado no Pop!_OS
+- Não há equivalente ao AUR; pacotes extras são instalados por download direto
 
 ## Dúvidas?
 

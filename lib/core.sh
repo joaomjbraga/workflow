@@ -57,6 +57,10 @@ install_package() {
   fi
   case "$PKG_MANAGER" in
     pacman) run_as_root pacman -Sy --noconfirm --needed "$pkg" ;;
+    apt)
+      run_as_root apt-get update -qq || true
+      run_as_root apt-get install -y "$pkg"
+      ;;
     *)
       log_error "Gerenciador de pacotes não implementado: $PKG_MANAGER"
       return 2
@@ -64,10 +68,48 @@ install_package() {
   esac
 }
 
+apt_update() {
+  if [ "$PKG_MANAGER" != "apt" ]; then
+    return 0
+  fi
+  if [ "$DRY_RUN" = "true" ]; then
+    log_info "[SIMULAÇÃO] Executaria apt-get update"
+    return 0
+  fi
+  run_as_root apt-get update -qq || log_warning "apt-get update falhou"
+}
+
+install_deb() {
+  local url="$1"
+  local tmp_dir
+  tmp_dir=$(temp_dir)
+  local deb_file="$tmp_dir/$(basename "$url")"
+
+  if [ "$DRY_RUN" = "true" ]; then
+    log_info "[SIMULAÇÃO] Baixaria e instalaria $url"
+    rm -rf "$tmp_dir"
+    return 0
+  fi
+
+  curl -fsSL "$url" -o "$deb_file" || {
+    log_warning "Falha ao baixar $url"
+    rm -rf "$tmp_dir"
+    return 1
+  }
+  run_as_root apt-get install -y "$deb_file" || {
+    log_warning "Falha ao instalar $deb_file"
+    rm -rf "$tmp_dir"
+    return 1
+  }
+  rm -rf "$tmp_dir"
+  log_success "Pacote .deb instalado: $url"
+}
+
 package_installed() {
   local pkg="$1"
   case "$PKG_MANAGER" in
     pacman) pacman -Q "$pkg" >/dev/null 2>&1 ;;
+    apt) dpkg -s "$pkg" >/dev/null 2>&1 ;;
     *) false ;;
   esac
 }

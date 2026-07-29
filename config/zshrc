@@ -1,62 +1,96 @@
-## Minimal zsh configuration tailored for the workflow bootstrap
+## Minimal Zsh configuration
 
-HISTFILE=~/.zsh_history
+# -----------------------------------------------------------------------------
+# History
+# -----------------------------------------------------------------------------
+
+HISTFILE="$HOME/.zsh_history"
 HISTSIZE=50000
 SAVEHIST=50000
 
+setopt APPEND_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_IGNORE_SPACE
 setopt HIST_FIND_NO_DUPS
 setopt HIST_REDUCE_BLANKS
-setopt SHARE_HISTORY
-setopt APPEND_HISTORY
-setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
 
+# -----------------------------------------------------------------------------
 # Completion
+# -----------------------------------------------------------------------------
+
 autoload -Uz compinit
-compinit -u
+compinit
+
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-zstyle ':completion:*' list-colors 'yes'
 
-# History navigation with arrows (use built-in widgets to avoid zsh-syntax-highlighting warnings)
+if command -v dircolors >/dev/null 2>&1; then
+    eval "$(dircolors -b)"
+fi
+
+# -----------------------------------------------------------------------------
+# Keybindings
+# -----------------------------------------------------------------------------
+
 bindkey '^[[A' history-beginning-search-backward
 bindkey '^[[B' history-beginning-search-forward
 
-# Quality of life
+# -----------------------------------------------------------------------------
+# Shell behavior
+# -----------------------------------------------------------------------------
+
 setopt AUTO_CD
-setopt CORRECT
+setopt AUTO_PUSHD
+setopt PUSHD_IGNORE_DUPS
 
-# Restore directory colors in ls and completion
+# -----------------------------------------------------------------------------
+# Environment
+# -----------------------------------------------------------------------------
+
+export PATH="$HOME/.local/bin:$PATH"
+
+export EDITOR="code --wait"
+export VISUAL="$EDITOR"
+
+export LESS="-R"
 export CLICOLOR=1
-export LS_COLORS='di=1;36:ln=1;35:so=1;32:pi=1;33:ex=1;32:bd=1;34:cd=1;34:su=1;31:sg=1;31:tw=1;33:ow=1;33'
 
-# Enable colorized ls on systems that support it
-if command -v dircolors >/dev/null 2>&1; then
-  eval "$(dircolors -b)"
-fi
-
-# Aliases
-alias ls='ls --color=auto'
-alias ll='ls -alF --color=auto'
-alias la='ls -A --color=auto'
-alias l='ls -CF --color=auto'
-
-# PATH adjustments
-export PATH="$HOME/.local/share:$PATH"
-
+# -----------------------------------------------------------------------------
 # Android SDK
+# -----------------------------------------------------------------------------
+
 export ANDROID_HOME="$HOME/Android/Sdk"
+
 export PATH="$PATH:$ANDROID_HOME/emulator"
 export PATH="$PATH:$ANDROID_HOME/platform-tools"
 
-# Go
-export PATH="$PATH:/usr/local/go/bin"
+# -----------------------------------------------------------------------------
+# Aliases
+# -----------------------------------------------------------------------------
 
+if ls --color=auto >/dev/null 2>&1; then
+    alias ls='ls --color=auto'
+    alias ll='ls -alF --color=auto'
+    alias la='ls -A --color=auto'
+    alias l='ls -CF --color=auto'
+fi
+
+# -----------------------------------------------------------------------------
 # NVM
+# -----------------------------------------------------------------------------
+
 export NVM_DIR="$HOME/.nvm"
+
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 
+# -----------------------------------------------------------------------------
 # Starship
-command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"
+# -----------------------------------------------------------------------------
+
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi

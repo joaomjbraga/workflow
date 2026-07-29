@@ -15,9 +15,12 @@ detect_distro() {
     arch|manjaro)
       PKG_MANAGER="pacman"
       ;;
+    pop)
+      PKG_MANAGER="apt"
+      ;;
     *)
       log_error "Distribuição não suportada: $DISTRO_NAME ($DISTRO_ID)"
-      log_error "Por enquanto apenas Arch Linux e derivados são suportados."
+      log_error "Por enquanto apenas Arch Linux, Manjaro e Pop!_OS são suportados."
       exit 1
       ;;
   esac

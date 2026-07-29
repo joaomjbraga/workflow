@@ -5,13 +5,17 @@ você precisa saber antes de sair usando:
 
 ---
 
-### Só funciona no Arch (e derivados)
+### Só funciona no Arch e Pop!_OS
 
-No momento, só **Arch Linux** e **Manjaro** são suportados. Se você usa
-outra distribuição, vai precisar criar um workflow pra ela em
-`workflows/<distro>/` e adicionar a detecção em `lib/detect.sh`.
-A estrutura foi feita pra ser extensível, mas a implementação extra
-fica por sua conta.
+No momento, **Arch Linux**, **Manjaro** e **Pop!_OS** são suportados.
+
+Se quiser adicionar outra, o esquema é:
+
+1. Cria `workflows/<distro>/main.sh`
+2. Implementa os passos
+3. Adiciona a detecção em `lib/detect.sh`
+
+A estrutura foi feita pra ser extensível, mas a implementação extra fica por sua conta.
 
 ---
 
@@ -30,6 +34,13 @@ O `yay-bin` é compilado na hora com `makepkg -si`. Isso significa que
 você precisa do `base-devel` instalado (o script instala) e que a
 compilação pode levar alguns segundos. Em máquinas mais fracas, pode
 demorar um pouco.
+
+---
+
+### Pop!_OS específico
+
+No Pop!_OS, `system76-driver` e `system76-power` já vêm pré-instalados
+e não precisam ser gerenciados pelo script.
 
 ---
 
